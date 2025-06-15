@@ -13,6 +13,7 @@ import com.zahid.locknest.navigation.NavGraph
 import com.zahid.locknest.ui.theme.LockNestTheme
 import com.zahid.locknest.ui.viewmodels.MainViewModel
 import com.zahid.locknest.util.BiometricManager
+import com.zahid.locknest.util.PasswordGenerator
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -20,6 +21,9 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var biometricManager: BiometricManager
+    
+    @Inject
+    lateinit var passwordGenerator: PasswordGenerator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +38,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavGraph(
                         navController = navController,
-                        biometricManager = biometricManager
+                        biometricManager = biometricManager,
+                        passwordGenerator = passwordGenerator
                     )
                 }
             }

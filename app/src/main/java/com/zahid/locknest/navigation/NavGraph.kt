@@ -1,11 +1,25 @@
 package com.zahid.locknest.navigation
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.zahid.locknest.ui.screens.*
 import com.zahid.locknest.util.BiometricManager
+import com.zahid.locknest.util.NavigationUtils.horizontallyAnimatedComposable
+import com.zahid.locknest.util.NavigationUtils.verticallyAnimatedComposable
+import com.zahid.locknest.util.PasswordGenerator
 
 sealed class Screen(val route: String) {
     object Splash : Screen("splash")
@@ -15,13 +29,15 @@ sealed class Screen(val route: String) {
     object PasswordDetail : Screen("password_detail/{passwordId}") {
         fun createRoute(passwordId: String) = "password_detail/$passwordId"
     }
+
     object Settings : Screen("settings")
 }
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    biometricManager: BiometricManager
+    biometricManager: BiometricManager,
+    passwordGenerator: PasswordGenerator
 ) {
     NavHost(
         navController = navController,
@@ -37,8 +53,12 @@ fun NavGraph(
             )
         }
 
-        composable(Screen.Login.route) {
+        composable(
+            Screen.Login.route,
+
+            ) {
             LoginScreen(
+
                 onLoginSuccess = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
@@ -48,7 +68,7 @@ fun NavGraph(
             )
         }
 
-        composable(Screen.Home.route) {
+        verticallyAnimatedComposable(Screen.Home.route) {
             HomeScreen(
                 onAddPassword = {
                     navController.navigate(Screen.AddPassword.route)
@@ -66,11 +86,14 @@ fun NavGraph(
             AddPasswordScreen(
                 onNavigateBack = {
                     navController.popBackStack()
-                }
+                },
+                passwordGenerator = passwordGenerator
             )
         }
 
-        composable(Screen.PasswordDetail.route) { backStackEntry ->
+        horizontallyAnimatedComposable(
+            Screen.PasswordDetail.route,
+        ) { backStackEntry ->
             val passwordId = backStackEntry.arguments?.getString("passwordId") ?: ""
             PasswordDetailScreen(
                 passwordId = passwordId,
@@ -80,7 +103,7 @@ fun NavGraph(
             )
         }
 
-        composable(Screen.Settings.route) {
+       horizontallyAnimatedComposable(Screen.Settings.route) {
             SettingsScreen(
                 onNavigateBack = {
                     navController.popBackStack()
@@ -88,4 +111,6 @@ fun NavGraph(
             )
         }
     }
-} 
+}
+
+

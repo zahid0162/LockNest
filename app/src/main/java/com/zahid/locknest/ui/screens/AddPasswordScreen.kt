@@ -17,17 +17,23 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.zahid.locknest.ui.components.PasswordGeneratorDialog
+import com.zahid.locknest.ui.components.PasswordStrengthMeter
 import com.zahid.locknest.ui.viewmodels.AddPasswordViewModel
+import com.zahid.locknest.util.PasswordGenerator
+import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddPasswordScreen(
     onNavigateBack: () -> Unit,
-    viewModel: AddPasswordViewModel = hiltViewModel()
+    viewModel: AddPasswordViewModel = hiltViewModel(),
+    passwordGenerator: PasswordGenerator
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showPassword by remember { mutableStateOf(false) }
     var showCategoryMenu by remember { mutableStateOf(false) }
+    var showPasswordGenerator by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
@@ -79,29 +85,47 @@ fun AddPasswordScreen(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
 
-            OutlinedTextField(
-                value = uiState.password,
-                onValueChange = viewModel::updatePassword,
-                label = { Text("Password") },
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                leadingIcon = {
-                    Icon(Icons.Default.Lock, contentDescription = null)
-                },
-                trailingIcon = {
-                    IconButton(onClick = { showPassword = !showPassword }) {
-                        Icon(
-                            if (showPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (showPassword) "Hide password" else "Show password"
-                        )
-                    }
-                },
-                visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Next
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedTextField(
+                    value = uiState.password,
+                    onValueChange = viewModel::updatePassword,
+                    label = { Text("Password") },
+                    modifier = Modifier.fillMaxWidth(),
+                    leadingIcon = {
+                        Icon(Icons.Default.Lock, contentDescription = null)
+                    },
+                    trailingIcon = {
+                        Row {
+                            IconButton(onClick = { showPasswordGenerator = true }) {
+                                Icon(
+                                    Icons.Default.Refresh,
+                                    contentDescription = "Generate Password"
+                                )
+                            }
+                            IconButton(onClick = { showPassword = !showPassword }) {
+                                Icon(
+                                    if (showPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                    contentDescription = if (showPassword) "Hide password" else "Show password"
+                                )
+                            }
+                        }
+                    },
+                    visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Next
+                    )
                 )
-            )
+                
+                // Show password strength meter
+                if (uiState.password.isNotEmpty()) {
+                    PasswordStrengthMeter(password = uiState.password)
+                }
+            }
 
             OutlinedTextField(
                 value = uiState.website,
@@ -184,5 +208,13 @@ fun AddPasswordScreen(
                 }
             }
         }
+    }
+    
+    if (showPasswordGenerator) {
+        PasswordGeneratorDialog(
+            onDismissRequest = { showPasswordGenerator = false },
+            onPasswordGenerated = viewModel::updatePassword,
+            passwordGenerator = passwordGenerator
+        )
     }
 } 

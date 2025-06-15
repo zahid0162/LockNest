@@ -1,9 +1,11 @@
 package com.zahid.locknest.ui.viewmodels
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zahid.locknest.ui.theme.ThemeManager
 import com.zahid.locknest.util.EncryptionUtil
+import com.zahid.locknest.util.PdfExporter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -18,13 +20,18 @@ data class SettingsUiState(
     val newPin: String = "",
     val confirmPin: String = "",
     val isCurrentPinVerified: Boolean = false,
+    val isPdfExporting: Boolean = false,
+    val includePdfPasswords: Boolean = false,
+    val exportVerificationPin: String = "",
+    val exportPinError: String? = null,
     val error: String? = null
 )
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val themeManager: ThemeManager,
-    private val encryptionUtil: EncryptionUtil
+    private val encryptionUtil: EncryptionUtil,
+    private val pdfExporter: PdfExporter
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -79,6 +86,45 @@ class SettingsViewModel @Inject constructor(
             _uiState.update { it.copy(confirmPin = pin, error = null) }
         }
     }
+    
+    fun updateExportVerificationPin(pin: String) {
+        if (pin.length <= 6 && pin.all { it.isDigit() }) {
+            _uiState.update { it.copy(exportVerificationPin = pin, exportPinError = null) }
+        }
+    }
+    
+    fun clearExportVerificationPin() {
+        _uiState.update { it.copy(exportVerificationPin = "", exportPinError = null) }
+    }
+    
+    fun verifyExportPin(onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val prefs = encryptionUtil.getEncryptedSharedPreferences()
+                val storedPinHash = prefs.getString("pin_hash", null)
+                
+                // For testing/development, allow "1234" as a default PIN
+                val pinToVerify = _uiState.value.exportVerificationPin
+                val exportPinHash = encryptionUtil.hashPin(pinToVerify)
+                val isDefaultPin = pinToVerify == "1234"
+                
+                if (storedPinHash == null && isDefaultPin) {
+                    // First time setup with default PIN
+                    _uiState.update { it.copy(exportPinError = null) }
+                    onResult(true)
+                } else if (storedPinHash == exportPinHash) {
+                    _uiState.update { it.copy(exportPinError = null) }
+                    onResult(true)
+                } else {
+                    _uiState.update { it.copy(exportPinError = "Incorrect PIN") }
+                    onResult(false)
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(exportPinError = "Error verifying PIN: ${e.message}") }
+                onResult(false)
+            }
+        }
+    }
 
     fun verifyCurrentPin() {
         viewModelScope.launch {
@@ -131,6 +177,27 @@ class SettingsViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = "Error changing PIN: ${e.message}") }
+            }
+        }
+    }
+    
+    fun exportPasswordsToPdf(uri: Uri, includePasswords: Boolean) {
+        viewModelScope.launch {
+            try {
+                _uiState.update { it.copy(isPdfExporting = true, error = null) }
+                
+                val result = pdfExporter.exportToPdf(uri, includePasswords)
+                
+                result.fold(
+                    onSuccess = { message ->
+                        _uiState.update { it.copy(isPdfExporting = false, error = message) }
+                    },
+                    onFailure = { error ->
+                        _uiState.update { it.copy(isPdfExporting = false, error = error.message) }
+                    }
+                )
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isPdfExporting = false, error = "Error exporting PDF: ${e.message}") }
             }
         }
     }

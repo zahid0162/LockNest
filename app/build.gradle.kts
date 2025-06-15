@@ -89,6 +89,12 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.48")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
     
+    // JSON parsing
+    implementation("com.google.code.gson:gson:2.10.1")
+    
+    // PDF Generation
+    implementation("com.itextpdf:itextpdf:5.5.13.3")
+    
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

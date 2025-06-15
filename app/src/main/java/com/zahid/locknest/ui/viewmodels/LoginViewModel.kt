@@ -87,8 +87,9 @@ class LoginViewModel @Inject constructor(
                     _uiState.update { it.copy(error = "PINs do not match") }
                     return
                 }
-                // Save PIN hash
-                prefs.edit().putString("pin_hash", _uiState.value.pin.hashCode().toString()).apply()
+                // Save PIN hash using the proper hashing method
+                val pinHash = encryptionUtil.hashPin(_uiState.value.pin)
+                prefs.edit().putString("pin_hash", pinHash).apply()
                 onAuthenticationSuccess()
             }
         } else {
@@ -96,7 +97,10 @@ class LoginViewModel @Inject constructor(
                 _uiState.update { it.copy(error = "No PIN set. Please set up a PIN.") }
                 return
             }
-            if (_uiState.value.pin.hashCode().toString() == storedPinHash) {
+            
+            // Use the proper hashing method for verification
+            val pinHash = encryptionUtil.hashPin(_uiState.value.pin)
+            if (pinHash == storedPinHash) {
                 onAuthenticationSuccess()
             } else {
                 _uiState.update { it.copy(error = "Incorrect PIN") }

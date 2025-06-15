@@ -1,5 +1,8 @@
 package com.zahid.locknest.ui.screens
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -22,6 +25,18 @@ fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsState()
     var showPinDialog by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
+    var showPdfExportDialog by remember { mutableStateOf(false) }
+    var showExportPinDialog by remember { mutableStateOf(false) }
+    var includePdfPasswords by remember { mutableStateOf(false) }
+
+    // PDF export launcher
+    val pdfExportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/pdf")
+    ) { uri: Uri? ->
+        uri?.let {
+            viewModel.exportPasswordsToPdf(it, includePdfPasswords)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -201,6 +216,47 @@ fun SettingsScreen(
             }
 
             Spacer(modifier = Modifier.height(8.dp))
+            
+            // Data Management Section
+            Text(
+                text = "Data Management",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column {
+                    // Export to PDF
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .clickable { showExportPinDialog = true },
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.PictureAsPdf,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text("Export Passwords to PDF")
+                        }
+                        Icon(
+                            Icons.Default.ChevronRight, 
+                            contentDescription = "Export to PDF"
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             // About
             Text(
@@ -321,6 +377,120 @@ fun SettingsScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showConfirmDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+    
+    // PIN verification dialog for export
+    if (showExportPinDialog) {
+        AlertDialog(
+            onDismissRequest = { showExportPinDialog = false },
+            title = { Text("Security Verification") },
+            text = {
+                Column {
+                    Text("Please enter your PIN to continue with the export")
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = uiState.exportVerificationPin,
+                        onValueChange = viewModel::updateExportVerificationPin,
+                        label = { Text("PIN") },
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                            keyboardType = KeyboardType.NumberPassword
+                        ),
+                        singleLine = true,
+                        visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation()
+                    )
+                    
+                    if (uiState.exportPinError != null) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = uiState.exportPinError!!,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.verifyExportPin { success ->
+                            if (success) {
+                                showExportPinDialog = false
+                                showPdfExportDialog = true
+                            }
+                        }
+                    },
+                    enabled = uiState.exportVerificationPin.length >= 4
+                ) {
+                    Text("Verify")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { 
+                    showExportPinDialog = false
+                    viewModel.clearExportVerificationPin()
+                }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+    
+    if (showPdfExportDialog) {
+        AlertDialog(
+            onDismissRequest = { showPdfExportDialog = false },
+            title = { Text("Export Passwords to PDF") },
+            text = {
+                Column {
+                    Text("This will export all your passwords to a PDF file.")
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = includePdfPasswords,
+                            onCheckedChange = { includePdfPasswords = it }
+                        )
+                        Text("Include actual passwords in export")
+                    }
+                    
+                    if (includePdfPasswords) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "Warning: Including passwords in the export creates a security risk. " +
+                            "Make sure to keep the file secure.",
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                    
+                    if (uiState.isPdfExporting) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Exporting passwords...")
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        pdfExportLauncher.launch("locknest_passwords.pdf")
+                        showPdfExportDialog = false
+                    },
+                    enabled = !uiState.isPdfExporting
+                ) {
+                    Text("Export")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showPdfExportDialog = false },
+                    enabled = !uiState.isPdfExporting
+                ) {
                     Text("Cancel")
                 }
             }
