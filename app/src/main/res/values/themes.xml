@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.LockNest" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/primary_dark</item>
+        
+        <!-- Disable splash screen -->
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+    
+    <!-- Splash Screen theme -->
+    <style name="Theme.LockNest.NoSplash" parent="Theme.LockNest">
+        <item name="android:windowDisablePreview">true</item>
+    </style>
+</resources>

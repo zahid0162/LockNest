@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.LockNest" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Disable the Android 12+ splash screen -->
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_app_logo</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/primary</item>
+        <item name="android:windowSplashScreenAnimationDuration">0</item>
+    </style>
+</resources> 
