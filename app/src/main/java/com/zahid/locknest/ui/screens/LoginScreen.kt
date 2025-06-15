@@ -1,6 +1,5 @@
 package com.zahid.locknest.ui.screens
 
-import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -11,11 +10,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.zahid.locknest.R
 import com.zahid.locknest.ui.viewmodels.LoginUiState
 import com.zahid.locknest.ui.viewmodels.LoginViewModel
 import com.zahid.locknest.ui.viewmodels.PinSetupStep
@@ -123,7 +124,7 @@ private fun AuthenticationOptions(
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Authenticate with Biometrics")
+                Text(stringResource(R.string.authenticate_with_biometrics))
             }
         }
 

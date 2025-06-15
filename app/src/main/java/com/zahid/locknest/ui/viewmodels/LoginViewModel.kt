@@ -1,7 +1,6 @@
 package com.zahid.locknest.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.zahid.locknest.util.BiometricManager
 import com.zahid.locknest.util.EncryptionUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -106,9 +105,5 @@ class LoginViewModel @Inject constructor(
                 _uiState.update { it.copy(error = "Incorrect PIN") }
             }
         }
-    }
-
-    fun clearError() {
-        _uiState.update { it.copy(error = null) }
     }
 } 

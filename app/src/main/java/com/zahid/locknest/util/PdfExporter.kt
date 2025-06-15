@@ -2,13 +2,10 @@ package com.zahid.locknest.util
 
 import android.content.Context
 import android.net.Uri
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
-import com.zahid.locknest.data.model.Password
 import com.zahid.locknest.data.repository.PasswordRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -30,7 +27,6 @@ class PdfExporter @Inject constructor(
      * @param includePasswords Whether to include actual password values in the export
      * @return Result with success message or error
      */
-    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun exportToPdf(uri: Uri, includePasswords: Boolean): Result<String> = withContext(Dispatchers.IO) {
         try {
             // Get all passwords

@@ -5,10 +5,8 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import java.security.KeyStore
 import java.security.MessageDigest
 import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 import javax.inject.Inject
@@ -18,7 +16,6 @@ import javax.inject.Singleton
 class EncryptionUtil @Inject constructor(
     private val context: Context
 ) {
-    private val ANDROID_KEYSTORE = "AndroidKeyStore"
     private val TRANSFORMATION = "AES/GCM/NoPadding"
     private val KEY_SIZE = 256
     private val GCM_TAG_LENGTH = 128

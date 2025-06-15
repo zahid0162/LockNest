@@ -15,8 +15,9 @@ import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.inject.Inject
@@ -29,38 +30,41 @@ class BackupManager @Inject constructor(
     private val encryptionUtil: EncryptionUtil
 ) {
     private val gson: Gson = GsonBuilder().setPrettyPrinting().create()
-    
+
     /**
      * Creates an encrypted backup of all passwords
      * @param uri The destination URI to save the backup
      * @return Result with success message or error
      */
+
     suspend fun exportData(uri: Uri): Result<String> = withContext(Dispatchers.IO) {
         try {
             // Get all passwords
             val passwords = passwordRepository.getAllPasswords().first()
-            
+
             // Convert to JSON
             val jsonData = gson.toJson(passwords)
-            
+
             // Encrypt the data
             val secretKey = generateSecretKey()
             val encryptedData = encryptionUtil.encryptData(jsonData, secretKey)
-            
+
             // Write to file
             context.contentResolver.openOutputStream(uri)?.use { outputStream ->
                 val writer = OutputStreamWriter(outputStream)
                 writer.write(encryptedData.toString(Charsets.UTF_8))
                 writer.flush()
             } ?: return@withContext Result.failure(Exception("Failed to open output stream"))
-            
-            val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+
+            val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(
+                Date()
+            )
             Result.success("Backup created successfully at $timestamp")
         } catch (e: Exception) {
             Result.failure(Exception("Export failed: ${e.message}"))
         }
     }
-    
+
     /**
      * Imports passwords from an encrypted backup file
      * @param uri The source URI to read the backup from
@@ -78,26 +82,26 @@ class BackupManager @Inject constructor(
                 }
                 stringBuilder.toString().toByteArray(Charsets.UTF_8)
             } ?: return@withContext Result.failure(Exception("Failed to open input stream"))
-            
+
             // Decrypt the data
             val secretKey = generateSecretKey()
             val jsonData = encryptionUtil.decryptData(encryptedData, secretKey)
-            
+
             // Parse JSON to password list
             val typeToken = object : TypeToken<List<Password>>() {}.type
             val passwords = gson.fromJson<List<Password>>(jsonData, typeToken)
-            
+
             // Save passwords to database
             passwords.forEach { password ->
                 passwordRepository.insertPassword(password)
             }
-            
+
             Result.success("Successfully imported ${passwords.size} passwords")
         } catch (e: Exception) {
             Result.failure(Exception("Import failed: ${e.message}"))
         }
     }
-    
+
     /**
      * Generates a SecretKey for encryption/decryption
      * @return SecretKey for AES encryption

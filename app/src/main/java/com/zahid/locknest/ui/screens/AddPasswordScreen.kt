@@ -1,27 +1,27 @@
 package com.zahid.locknest.ui.screens
 
-import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.zahid.locknest.R
 import com.zahid.locknest.ui.components.PasswordGeneratorDialog
 import com.zahid.locknest.ui.components.PasswordStrengthMeter
 import com.zahid.locknest.ui.viewmodels.AddPasswordViewModel
 import com.zahid.locknest.util.PasswordGenerator
-import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,10 +44,10 @@ fun AddPasswordScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add Password") },
+                title = { Text(stringResource(R.string.add_password)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 }
             )
@@ -64,7 +64,7 @@ fun AddPasswordScreen(
             OutlinedTextField(
                 value = uiState.title,
                 onValueChange = viewModel::updateTitle,
-                label = { Text("Title") },
+                label = { Text(stringResource(R.string.title)) },
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = {
                     Icon(Icons.Default.Title, contentDescription = null)
@@ -150,11 +150,11 @@ fun AddPasswordScreen(
                     value = uiState.category,
                     onValueChange = { },
                     readOnly = true,
-                    label = { Text("Category") },
+                    label = { Text(stringResource(R.string.category)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showCategoryMenu) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor()
+                        .menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
                 )
 
                 ExposedDropdownMenu(
@@ -176,7 +176,7 @@ fun AddPasswordScreen(
             OutlinedTextField(
                 value = uiState.notes,
                 onValueChange = viewModel::updateNotes,
-                label = { Text("Notes (Optional)") },
+                label = { Text(stringResource(R.string.notes_optional)) },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3,
                 maxLines = 5

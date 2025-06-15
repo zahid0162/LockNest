@@ -185,9 +185,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _uiState.update { it.copy(isPdfExporting = true, error = null) }
-                
                 val result = pdfExporter.exportToPdf(uri, includePasswords)
-                
                 result.fold(
                     onSuccess = { message ->
                         _uiState.update { it.copy(isPdfExporting = false, error = message) }

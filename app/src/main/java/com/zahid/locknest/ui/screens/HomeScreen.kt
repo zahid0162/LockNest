@@ -10,11 +10,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.zahid.locknest.R
 import com.zahid.locknest.data.model.Password
 import com.zahid.locknest.ui.viewmodels.HomeViewModel
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,13 +28,13 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var showFab by remember { mutableStateOf(true) }
+    val showFab by remember { mutableStateOf(true) }
     var showCategoryMenu by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("LockNest") },
+                title = { Text(stringResource(R.string.locknest)) },
                 actions = {
                     IconButton(onClick = { showCategoryMenu = true }) {
                         Icon(Icons.Default.Category, contentDescription = "Filter by Category")
@@ -160,7 +163,6 @@ private fun EmptyState() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordCard(
     password: Password,

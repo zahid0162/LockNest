@@ -3,7 +3,6 @@ package com.zahid.locknest.ui.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -56,15 +55,15 @@ fun PasswordStrengthMeter(
                 color = color
             )
         }
-        
+
         LinearProgressIndicator(
-            progress = progress,
+            progress = { progress },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(8.dp)
                 .clip(MaterialTheme.shapes.small),
             color = color,
-            trackColor = MaterialTheme.colorScheme.surfaceVariant
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
         )
     }
 }

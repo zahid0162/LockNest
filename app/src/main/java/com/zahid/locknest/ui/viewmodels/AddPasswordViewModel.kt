@@ -82,11 +82,4 @@ class AddPasswordViewModel @Inject constructor(
         }
     }
 
-    fun resetState() {
-        _uiState.update {
-            AddPasswordUiState(
-                category = it.category // Preserve the selected category
-            )
-        }
-    }
-} 
+}

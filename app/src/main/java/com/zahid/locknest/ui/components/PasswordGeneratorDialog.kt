@@ -15,14 +15,13 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.zahid.locknest.util.PasswordGenerator
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordGeneratorDialog(
     onDismissRequest: () -> Unit,
     onPasswordGenerated: (String) -> Unit,
     passwordGenerator: PasswordGenerator
 ) {
-    var passwordLength by remember { mutableStateOf(16) }
+    var passwordLength by remember { mutableIntStateOf(16) }
     var includeUppercase by remember { mutableStateOf(true) }
     var includeLowercase by remember { mutableStateOf(true) }
     var includeNumbers by remember { mutableStateOf(true) }

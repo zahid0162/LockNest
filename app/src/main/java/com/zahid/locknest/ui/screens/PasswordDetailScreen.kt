@@ -1,8 +1,8 @@
 package com.zahid.locknest.ui.screens
 
-import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,7 +17,6 @@ import com.zahid.locknest.ui.viewmodels.PasswordDetailViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordDetailScreen(
-    passwordId: String,
     onNavigateBack: () -> Unit,
     viewModel: PasswordDetailViewModel = hiltViewModel()
 ) {
@@ -44,7 +43,7 @@ fun PasswordDetailScreen(
                 title = { Text("Password Details") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {

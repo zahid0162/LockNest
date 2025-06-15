@@ -69,18 +69,4 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun refresh() {
-        loadPasswords()
-    }
-
-    fun deletePassword(password: Password) {
-        viewModelScope.launch {
-            try {
-                passwordRepository.deletePassword(password)
-                loadPasswords() // Refresh the list after deletion
-            } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
-            }
-        }
-    }
-} 
+}

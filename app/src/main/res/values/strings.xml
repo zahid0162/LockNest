@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">LockNest</string>
+    <string name="category">Category</string>
+    <string name="notes_optional">Notes (Optional)</string>
+    <string name="title">Title</string>
+    <string name="add_password">Add Password</string>
+    <string name="locknest">LockNest</string>
+    <string name="authenticate_with_biometrics">Authenticate with Biometrics</string>
 </resources>

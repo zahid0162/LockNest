@@ -76,32 +76,4 @@ class PasswordDetailViewModel @Inject constructor(
         }
     }
 
-    fun updatePassword(
-        title: String,
-        username: String,
-        password: String,
-        website: String?,
-        notes: String?,
-        category: String
-    ) {
-        val currentPassword = _uiState.value.password ?: return
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            try {
-                val updatedPassword = currentPassword.copy(
-                    title = title,
-                    username = username,
-                    password = password,
-                    website = website,
-                    notes = notes,
-                    category = category,
-                    updatedAt = System.currentTimeMillis()
-                )
-                passwordRepository.updatePassword(updatedPassword)
-                _uiState.update { it.copy(password = updatedPassword, isLoading = false) }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message, isLoading = false) }
-            }
-        }
-    }
 } 

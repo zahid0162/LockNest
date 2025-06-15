@@ -1,17 +1,6 @@
 package com.zahid.locknest.navigation
 
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
-import androidx.navigation.NamedNavArgument
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -53,7 +42,7 @@ fun NavGraph(
             )
         }
 
-        composable(
+        horizontallyAnimatedComposable(
             Screen.Login.route,
 
             ) {
@@ -82,7 +71,7 @@ fun NavGraph(
             )
         }
 
-        composable(Screen.AddPassword.route) {
+        horizontallyAnimatedComposable(Screen.AddPassword.route) {
             AddPasswordScreen(
                 onNavigateBack = {
                     navController.popBackStack()
@@ -93,10 +82,8 @@ fun NavGraph(
 
         horizontallyAnimatedComposable(
             Screen.PasswordDetail.route,
-        ) { backStackEntry ->
-            val passwordId = backStackEntry.arguments?.getString("passwordId") ?: ""
+        ) {
             PasswordDetailScreen(
-                passwordId = passwordId,
                 onNavigateBack = {
                     navController.popBackStack()
                 }
